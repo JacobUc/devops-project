@@ -75,14 +75,14 @@ class VehicleControllerTest extends TestCase
 
         // Crear un vehículo para la prueba
         Vehicle::factory()->create([
-            'brand' => 'Toyota',
-            'model' => 'Corolla',
-            'vin' => '1234567890ABCDEF',
+            'brand' => 'NISSAN',
+            'model' => 'Versa',
+            'vin' => '12345678910sdfqw',
             'plate_number' => 'XYZ123',
             'purchase_date' => '2021-01-01',
             'cost' => 20000,
             'photo' => 'image.jpg',
-            'registration_date' => '2021-01-01',
+            'registration_date' => '2025-02-02',
         ]);
 
         // Hacer la solicitud GET para obtener todos los vehículos
