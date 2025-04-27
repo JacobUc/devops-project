@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\RouteController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\VehicleController;
@@ -23,4 +24,13 @@ Route::middleware('auth:sanctum')->prefix('vehicles')->group(function () {
     Route::put('{id}', [VehicleController::class, 'update']);
     //Eliminar un vehiculo
     Route::delete('{id}', [VehicleController::class, 'destroy']);
+});
+
+// Route
+Route::prefix('routes')->group(function () {
+    Route::get('/', [RouteController::class, 'index']);
+    Route::get('{id}', [RouteController::class, 'show']);
+    Route::post('/', [RouteController::class, 'store']);
+    Route::put('{id}', [RouteController::class, 'update']);
+    Route::delete('{id}', [RouteController::class, 'destroy']);
 });
