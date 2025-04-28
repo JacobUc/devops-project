@@ -10,7 +10,8 @@ return new class extends Migration
     {
         Schema::create('drivers', function (Blueprint $table) {
             $table->id('id_driver');
-            $table->string('full_name');
+            $table->string('name');
+            $table->string('last_name');
             $table->date('birth_date');
             $table->string('curp')->unique();
             $table->string('address');
