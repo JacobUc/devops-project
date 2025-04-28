@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('routes', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('id_assignment');
             $table->string('name');
             $table->date('route_date');
             $table->boolean('was_successful')->nullable();
@@ -23,6 +24,9 @@ return new class extends Migration
             $table->double('end_latitude', 10, 6);
             $table->double('end_longitude', 10, 6);            
             $table->timestamps();
+
+            //Laves foráneas
+            $table->foreign('id_assignment')->references('id_assignment')->on('assignments')->onDelete('cascade');
         });
     }
 
