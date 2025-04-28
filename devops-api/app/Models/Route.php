@@ -18,4 +18,9 @@ class Route extends Model
         'end_latitude',
         'end_longitude',
     ];
+
+    public function assignment()
+    {
+        return $this->belongsTo(Assignment::class, 'id_assignment', 'id_assignment');
+    }
 }
