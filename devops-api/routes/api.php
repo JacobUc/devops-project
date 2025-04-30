@@ -5,12 +5,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\AssignmentController;
+use App\Http\Controllers\InvitationCodeController;
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
 // })->middleware('auth:sanctum');
 
-Route::get('/hello-world', function () {    
+Route::get('/hello-world', function () {
     return 'Hello world';
 });
 //primer Aproach de autentificado
@@ -34,6 +35,15 @@ Route::prefix('routes')->group(function () {
     Route::post('/', [RouteController::class, 'store']);
     Route::put('{id}', [RouteController::class, 'update']);
     Route::delete('{id}', [RouteController::class, 'destroy']);
+});
+
+//Invitation code
+Route::prefix('invitationCode')->group(function () {
+    Route::get('/', [InvitationCodeController::class, 'index']);
+    Route::get('{id}', [InvitationCodeController::class, 'show']);
+    Route::post('/', [InvitationCodeController::class, 'store']);
+    Route::put('{id}', [InvitationCodeController::class, 'update']);
+    Route::delete('{id}', [InvitationCodeController::class, 'destroy']);
 });
 
 // Assignment
