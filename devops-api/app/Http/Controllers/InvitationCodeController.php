@@ -33,7 +33,7 @@ class InvitationCodeController extends Controller
         }catch(\Exception $e){
             return response()->json([
                 'message' => 'Error retrieving invitation codes',
-                'data' => null,
+                'data' => $e->getMessage(),
                 'status' => 500,
             ], 500);
         }
@@ -81,7 +81,7 @@ class InvitationCodeController extends Controller
         }catch(\Exception $e){
             return response()->json([
                 'message' => 'Error creating invitation code',
-                'data' => null,
+                'data' => $e->getMessage(),
                 'status' => 500,
             ], 500);
         }
@@ -109,7 +109,7 @@ class InvitationCodeController extends Controller
         }catch(\Exception $e){
             return response()->json([
                 'message' => 'Error retrieving invitation code',
-                'data' => null,
+                'data' => $e->getMessage(),
                 'status' => 500,
             ], 500);
         }
@@ -157,7 +157,7 @@ class InvitationCodeController extends Controller
         }catch(\Exception $e){
             return response()->json([
                 'message' => 'Error updating invitation code',
-                'data' => null,
+                'data' => $e->getMessage(),
                 'status' => 500,
             ], 500);
         }
@@ -188,7 +188,7 @@ class InvitationCodeController extends Controller
         }catch(\Exception $e){
             return response()->json([
                 'message' => 'Error deleting invitation code',
-                'data' => null,
+                'data' => $e->getMessage(),
                 'status' => 500,
             ], 500);
         }
