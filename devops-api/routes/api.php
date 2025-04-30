@@ -23,7 +23,7 @@ Route::get('/hello-world', function () {
 });
 
 //primer Aproach de autentificado
-Route::middleware('auth:sanctum')->prefix('vehicles')->group(function () {
+Route::prefix('vehicles')->group(function () {
     //Obtener todos los vehiculos
     Route::get('/', [VehicleController::class, 'index']);
     Route::post('/', [VehicleController::class, 'store']);
@@ -35,7 +35,7 @@ Route::middleware('auth:sanctum')->prefix('vehicles')->group(function () {
 
 
 // Route
-Route::middleware('auth:sanctum')->prefix('routes')->group(function () {
+Route::prefix('routes')->group(function () {
     Route::get('/', [RouteController::class, 'index']);
     Route::get('{id}', [RouteController::class, 'show']);
     Route::post('/', [RouteController::class, 'store']);
@@ -61,7 +61,7 @@ Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
 });
 
 // Assignment
-Route::middleware('auth:sanctum')->prefix('assignments')->group(function () {
+Route::prefix('assignments')->group(function () {
     Route::get('/', [AssignmentController::class, 'index']);
     Route::get('{id}', [AssignmentController::class, 'show']);
     Route::post('/', [AssignmentController::class, 'store']);
