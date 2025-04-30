@@ -11,4 +11,5 @@ mysql -h $DB_HOST -u$DB_USERNAME -p$DB_PASSWORD -e "CREATE DATABASE IF NOT EXIST
 
 # Migraciones y ejecución de Laravel
 php artisan migrate --force
+php artisan storage:link
 php artisan serve --host=0.0.0.0 --port=8000
