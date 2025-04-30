@@ -30,6 +30,7 @@ Route::middleware('auth:sanctum')->prefix('vehicles')->group(function () {
     Route::get('{id}', [VehicleController::class, 'show']);
     Route::put('{id}', [VehicleController::class, 'update']);
     Route::delete('{id}', [VehicleController::class, 'destroy']);
+    Route::patch('{id}', [VehicleController::class, 'update']);
 });
 
 
