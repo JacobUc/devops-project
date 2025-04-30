@@ -81,7 +81,7 @@ class AdminController extends Controller
             $newAdmin = Admin::create([
                 'name' => $request->name,
                 'email' => $request->email,
-                'password' => bcrypt($request->password),
+                'password' => $request->password,
                 'id_invitation_code' => $invitationCode->id,
             ]);
 
@@ -177,7 +177,7 @@ class AdminController extends Controller
             }
 
             if ($request->has('password')) {
-                $admin->password = Hash::make($request->password);
+                $admin->password = $request->password;
             }
 
             $admin->save();
@@ -185,7 +185,8 @@ class AdminController extends Controller
             $adminResponseDTO = [
                 'id' => $admin->id,
                 'name' => $admin->name,
-                'email' => $admin->email
+                'email' => $admin->email,
+                'password' => $admin->password,
             ];
 
             return response()->json([
