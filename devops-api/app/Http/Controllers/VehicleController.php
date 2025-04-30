@@ -13,11 +13,9 @@ class VehicleController extends Controller
     public function update(UpdateVehicleRequest $request, $id): JsonResponse
     {
 
-        \Log::info('Datos recibidos en update:', $request->all());
+        \Log::info('Datos en update:', $request->all());
         $vehicle = Vehicle::findOrFail($id);
         
-        //Log::debug('Update.Vehicle.input', $request->all());
-        //Log::debug('Update.Vehicle.before', $vehicle->toArray());
     
         $data = $request->only([
             'brand',
@@ -32,18 +30,16 @@ class VehicleController extends Controller
             $data['photo'] = $path;
             Log::debug('Update.Vehicle.photo_path', ['path' => $path]);
         }
-       // \Log::debug('Update.Vehicle.request_method', ['method' => request()->method()]);
-       // \Log::debug('Update.Vehicle.content', request()->all());
+
         
         $vehicle->update($data);
     
-        // ––> Loguea el estado después de save
-       // Log::debug('Update.Vehicle.after', $vehicle->toArray());
-    
+
+    //Era para revisar si habia algo mal a la hora de salvar
         return response()->json([
-            'before' => $vehicle->getOriginal(),   // valores antes del update
-            'input'  => $request->all(),           // lo que tú mandaste
-            'after'  => $vehicle->toArray(),       // valores guardados
+            'before' => $vehicle->getOriginal(),   
+            'input'  => $request->all(),           
+            'after'  => $vehicle->toArray(),       
         ], 200);
     }
     
