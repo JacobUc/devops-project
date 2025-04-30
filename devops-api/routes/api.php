@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\AssignmentController;
+use App\Http\Controllers\DriverController;
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
@@ -44,3 +45,10 @@ Route::prefix('assignments')->group(function () {
     Route::put('{id}', [AssignmentController::class, 'update']);
     Route::delete('{id}', [AssignmentController::class, 'destroy']);
 });
+
+Route::get('/drivers', [DriverController::class, 'index']);
+Route::get('/drivers/{id}', [DriverController::class, 'show']);
+Route::post('/drivers', [DriverController::class, 'store']);
+Route::put('/drivers/{id}', [DriverController::class, 'update']);
+Route::patch('/drivers/{id}', [DriverController::class, 'updatePartial']);
+Route::delete('/drivers/{id}', [DriverController::class, 'destroy']);
