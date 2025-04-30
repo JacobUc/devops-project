@@ -13,19 +13,15 @@ use App\Http\Controllers\AssignmentController;
 Route::get('/hello-world', function () {    
     return 'Hello world';
 });
-//primer Aproach de autentificado
-Route::middleware('auth:sanctum')->prefix('vehicles')->group(function () {
-    //Obtener todos los vehiculos
+//Vehicles
+Route::prefix('vehicles')->group(function () {
     Route::get('/', [VehicleController::class, 'index']);
-    //Nuevo vehiculo
     Route::post('/', [VehicleController::class, 'store']);
-    //Obtener un vehiculo por ID
     Route::get('{id}', [VehicleController::class, 'show']);
-    //Actualizar un vehiculo
     Route::put('{id}', [VehicleController::class, 'update']);
-    //Eliminar un vehiculo
     Route::delete('{id}', [VehicleController::class, 'destroy']);
 });
+
 
 // Route
 Route::prefix('routes')->group(function () {
@@ -44,3 +40,4 @@ Route::prefix('assignments')->group(function () {
     Route::put('{id}', [AssignmentController::class, 'update']);
     Route::delete('{id}', [AssignmentController::class, 'destroy']);
 });
+

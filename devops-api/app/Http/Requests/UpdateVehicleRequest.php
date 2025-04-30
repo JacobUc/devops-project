@@ -6,10 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateVehicleRequest extends FormRequest
 {
-    public function authorize()
-    {
-        return true; // GPT Cambiar si deseas aplicar algún control de permisos
-    }
+
 
     public function rules()
     {
