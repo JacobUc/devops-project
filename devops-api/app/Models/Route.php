@@ -8,6 +8,7 @@ class Route extends Model
 {
     //
     protected $fillable = [
+        'id_assignment',
         'name',
         'route_date',
         'was_successful',
