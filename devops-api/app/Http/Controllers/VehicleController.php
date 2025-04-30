@@ -4,9 +4,50 @@ namespace App\Http\Controllers;
 use App\Models\Vehicle;
 use App\Http\Requests\CreateVehicleRequest;
 use App\Http\Requests\UpdateVehicleRequest;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Http\JsonResponse;
 
 class VehicleController extends Controller
 {
+
+    public function update(UpdateVehicleRequest $request, $id): JsonResponse
+    {
+
+        \Log::info('Datos recibidos en update:', $request->all());
+        $vehicle = Vehicle::findOrFail($id);
+        
+        //Log::debug('Update.Vehicle.input', $request->all());
+        //Log::debug('Update.Vehicle.before', $vehicle->toArray());
+    
+        $data = $request->only([
+            'brand',
+            'model',
+            'vin',
+            'plate_number',
+            'purchase_date',
+            'cost',
+        ]);
+        if ($request->hasFile('photo')) {
+            $path = $request->file('photo')->store('photos', 'public');
+            $data['photo'] = $path;
+            Log::debug('Update.Vehicle.photo_path', ['path' => $path]);
+        }
+       // \Log::debug('Update.Vehicle.request_method', ['method' => request()->method()]);
+       // \Log::debug('Update.Vehicle.content', request()->all());
+        
+        $vehicle->update($data);
+    
+        // ––> Loguea el estado después de save
+       // Log::debug('Update.Vehicle.after', $vehicle->toArray());
+    
+        return response()->json([
+            'before' => $vehicle->getOriginal(),   // valores antes del update
+            'input'  => $request->all(),           // lo que tú mandaste
+            'after'  => $vehicle->toArray(),       // valores guardados
+        ], 200);
+    }
+    
+
     public function index()
     {
         return Vehicle::all();
@@ -34,22 +75,6 @@ class VehicleController extends Controller
     public function show($id)
     {
         return Vehicle::findOrFail($id);
-    }
-
-    public function update(UpdateVehicleRequest $request, $id)
-    {
-        $vehicle = Vehicle::findOrFail($id);
-
-        if ($request->hasFile('photo')) {
-            // eliminar la foto anterior y subir
-            Storage::disk('public')->delete($vehicle->photo);
-            $path = $request->file('photo')->store('photos', 'public');
-            $vehicle->photo = $path;
-        }
-
-        $vehicle->update($request->validated());
-
-        return response()->json($vehicle, 200);
     }
 
     public function destroy($id)
