@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\RouteController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -44,6 +45,15 @@ Route::prefix('invitationCode')->group(function () {
     Route::post('/', [InvitationCodeController::class, 'store']);
     Route::put('{id}', [InvitationCodeController::class, 'update']);
     Route::delete('{id}', [InvitationCodeController::class, 'destroy']);
+});
+
+//Admin
+Route::prefix('admin')->group(function () {
+    Route::get('/', [AdminController::class, 'index']);
+    Route::get('{id}', [AdminController::class, 'show']);
+    Route::post('/', [AdminController::class, 'store']);
+    Route::put('{id}', [AdminController::class, 'update']);
+    Route::delete('{id}', [AdminController::class, 'destroy']);
 });
 
 // Assignment
