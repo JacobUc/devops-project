@@ -1,32 +1,40 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\RouteController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\AssignmentController;
 use App\Http\Controllers\DriverController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\InvitationCodeController;
+
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
 // })->middleware('auth:sanctum');
 
-Route::get('/hello-world', function () {    
+
+//Routes without authentication
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/admin', [AdminController::class, 'store']);
+
+Route::get('/hello-world', function () {
     return 'Hello world';
 });
+
 //primer Aproach de autentificado
-Route::middleware('auth:sanctum')->prefix('vehicles')->group(function () {
+Route::prefix('vehicles')->group(function () {
     //Obtener todos los vehiculos
     Route::get('/', [VehicleController::class, 'index']);
-    //Nuevo vehiculo
     Route::post('/', [VehicleController::class, 'store']);
-    //Obtener un vehiculo por ID
     Route::get('{id}', [VehicleController::class, 'show']);
-    //Actualizar un vehiculo
     Route::put('{id}', [VehicleController::class, 'update']);
-    //Eliminar un vehiculo
     Route::delete('{id}', [VehicleController::class, 'destroy']);
+    Route::patch('{id}', [VehicleController::class, 'update']);
 });
+
 
 // Route
 Route::prefix('routes')->group(function () {
@@ -35,6 +43,23 @@ Route::prefix('routes')->group(function () {
     Route::post('/', [RouteController::class, 'store']);
     Route::put('{id}', [RouteController::class, 'update']);
     Route::delete('{id}', [RouteController::class, 'destroy']);
+});
+
+//Invitation code
+Route::middleware('auth:sanctum')->prefix('invitationCode')->group(function () {
+    Route::get('/', [InvitationCodeController::class, 'index']);
+    Route::get('{id}', [InvitationCodeController::class, 'show']);
+    Route::post('/', [InvitationCodeController::class, 'store']);
+    Route::put('{id}', [InvitationCodeController::class, 'update']);
+    Route::delete('{id}', [InvitationCodeController::class, 'destroy']);
+});
+
+//Admin
+Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
+    Route::get('/', [AdminController::class, 'index']);
+    Route::get('{id}', [AdminController::class, 'show']);
+    Route::put('{id}', [AdminController::class, 'update']);
+    Route::delete('{id}', [AdminController::class, 'destroy']);
 });
 
 // Assignment
@@ -52,3 +77,4 @@ Route::post('/drivers', [DriverController::class, 'store']);
 Route::put('/drivers/{id}', [DriverController::class, 'update']);
 Route::patch('/drivers/{id}', [DriverController::class, 'updatePartial']);
 Route::delete('/drivers/{id}', [DriverController::class, 'destroy']);
+

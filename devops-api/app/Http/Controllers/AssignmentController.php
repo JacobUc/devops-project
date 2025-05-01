@@ -11,8 +11,21 @@ class AssignmentController extends Controller
 {
     public function index()
     {
-        return Assignment::all();
+        $assignments = Assignment::all();
+    
+        if ($assignments->isEmpty()) {
+            return response()->json([
+                'message' => 'No assignments available.',
+                'data' => []
+            ], 200);
+        }
+    
+        return response()->json([
+            'message' => 'Assignment list retrieved successfully.',
+            'data' => $assignments
+        ], 200);
     }
+    
 
     public function store(Request $request)
     {
@@ -81,17 +94,18 @@ class AssignmentController extends Controller
 
     public function show($id)
     {
-        // If the assignment does not exist, it returns a 404 error.
         $assignment = Assignment::find($id);
     
         if (!$assignment) {
-            $data = [
-                'message' => 'Assignment not found',
-                'status' => 404
-            ];
-            return response()->json($data, 404);
+            return response()->json([
+                'message' => 'Assignment not found'
+            ], 404);
         }
-        return response()->json($assignment);
+    
+        return response()->json([
+            'message' => 'Assignment retrieved successfully',
+            'data' => $assignment
+        ], 200);
     }
 
     public function update(Request $request, $id)
