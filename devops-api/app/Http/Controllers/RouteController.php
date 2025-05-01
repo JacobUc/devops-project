@@ -27,8 +27,7 @@ class RouteController extends Controller
                 'start_longitude' => 'required|numeric|between:-180,180',
                 'end_latitude' => 'required|numeric|between:-90,90',
                 'end_longitude' => 'required|numeric|between:-180,180',
-                'exists:assignments,id',
-                'unique:routes,id_assignment'
+                'id_assignment' =>'required|exists:assignments'
             ]);
             $route = Route::create($validated);
             return response()->json($route, 201);
