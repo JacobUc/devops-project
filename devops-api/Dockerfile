@@ -1,32 +1,21 @@
-FROM php:8.2-cli
+FROM php:8.2-apache
 
-# Instala dependencias del sistema
+# Instala extensiones requeridas
 RUN apt-get update && apt-get install -y \
-    git \
-    curl \
-    libzip-dev \
-    libpng-dev \
-    libonig-dev \
-    libxml2-dev \
-    unzip \
-    zip \
-    default-mysql-client
+    libzip-dev unzip git && \
+    docker-php-ext-install pdo pdo_mysql zip
 
-# Instalar extensiones PHP necesarias
-RUN docker-php-ext-install pdo pdo_mysql mbstring zip exif pcntl bcmath gd
+RUN a2enmod rewrite
 
-# Instalar Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+# Copia todo el proyecto ya "compilado"
+COPY . /var/www/html
 
 WORKDIR /var/www/html
-COPY . .
-COPY .env.docker .env
-COPY entrypoint.sh ./entrypoint.sh
 
-RUN chmod +x entrypoint.sh \
-    && mkdir -p storage/framework/{sessions,views,cache} \
-    && chmod -R 775 storage bootstrap/cache
+RUN chown -R www-data:www-data storage bootstrap/cache && \
+    chmod -R 775 storage bootstrap/cache
 
-EXPOSE 8000
+COPY ./docker/apache/000-default.conf /etc/apache2/sites-available/000-default.conf
 
-CMD ["sh", "./entrypoint.sh"]
+EXPOSE 80
+CMD ["apache2-foreground"]
