@@ -1,2 +1,5 @@
-vendor
-Dockerfile
+.git
+.gitignore
+README.md
+.env
+
