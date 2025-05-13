@@ -15,7 +15,7 @@ WORKDIR /var/www/html
 RUN chown -R www-data:www-data storage bootstrap/cache && \
     chmod -R 775 storage bootstrap/cache
 
-COPY ./docker/apache/000-default.conf /etc/apache2/sites-available/000-default.conf
+#COPY ./docker/apache/000-default.conf /etc/apache2/sites-available/000-default.conf
 
 EXPOSE 80
 CMD ["apache2-foreground"]
