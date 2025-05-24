@@ -6,18 +6,24 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Driver;
 use Illuminate\Support\Facades\Validator;
+use App\Services\LoggerService;
 
 class DriverController extends Controller
 {
     public function index(){
         $drivers = Driver::all(); 
         if ($drivers->isEmpty()) {
+            LoggerService::error('No se encontraron conductores');
             $data = [
                 'message' => 'No se encontraron conductores',
                 'status' => 404
             ];
             return response()->json($data, 404);
         }
+        LoggerService::info('Listado de conductores obtenido', [
+            'total' => count($drivers),
+        ]);
+
         return response()->json($drivers,200);
     }
     public function store(Request $request){
@@ -33,6 +39,11 @@ class DriverController extends Controller
 
         ]);
         if ($validator->fails()) {
+            LoggerService::error('Error en la validación al crear conductor', [
+                'errores' => $validator->errors(),
+                'input' => $request->all()
+            ]);
+
             $data =[
                 'message' => 'Error en la validación de datos',
                 'errors' => $validator->errors(),
@@ -52,6 +63,8 @@ class DriverController extends Controller
             'system_entry_date' => $request->system_entry_date
         ]);
         if(!$driver){
+            LoggerService::error('Error al crear conductor');
+
             $data = [
                 'message' => 'Error al crear al conductor',
                 'status' => 500
@@ -61,28 +74,35 @@ class DriverController extends Controller
             'driver' => $driver,
             'status' => 201
         ];
+        LoggerService::info('Conductor creado', [
+            'id' => $driver->id
+        ]);
         return response()->json($data, 201);
     }
     public function show($id){
         $driver = Driver::find($id);
 
         if(!$driver){
+            LoggerService::error('Conductor no encontrado', ['id' => $id]);
             $data = [
                 'message' => 'Conductor no encontrado',
                 'status' => 404
             ];
+            
             return response()->json($data, 404);
         }
         $data = [
             'driver' => $driver,
             'status' => 200
         ];
+        LoggerService::debug('Conductor consultado', ['id' => $driver->id]);
         return response()->json($data, 200);
     }
     public function destroy($id){
         $driver = Driver::find($id);
 
         if(!$driver){
+            LoggerService::error('Conductor no encontrado para eliminar', ['id' => $id]);
             $data = [
                 'message' => 'driver no encontrado',
                 'status' => 404
@@ -95,12 +115,14 @@ class DriverController extends Controller
             'message' => '$driver delete',
             'status' => 200
         ];
+        LoggerService::info('Conductor eliminado', ['id' => $id]);
         return response()->json($data, 200);
     }
     public function update (Request $request, $id){
         $driver = Driver::find($id);
 
         if(!$driver){
+            LoggerService::error('Conductor no encontrado para actualizar', ['id' => $id]);
             $data = [
                 'message' => 'driver no encontrado',
                 'status' => 404
@@ -120,6 +142,11 @@ class DriverController extends Controller
 
         ]);
         if ($validator->fails()) {
+            LoggerService::error('Error en la validación al actualizar conductor', [
+                'errores' => $validator->errors(),
+                'input' => $request->all()
+            ]);
+
             $data =[
                 'message' => 'Error en la validación de datos',
                 'errors' => $validator->errors(),
@@ -144,6 +171,9 @@ class DriverController extends Controller
             'student' => $driver,
             'status' => 200
         ];
+        LoggerService::info('Conductor actualizado', [
+            'id' => $driver->id
+        ]);
         return response()->json($data, 200);
     }
     public function updatePartial(Request $request, $id){

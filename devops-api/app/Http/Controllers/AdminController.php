@@ -8,6 +8,7 @@ use App\Models\Admin;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
+use App\Services\LoggerService;
 
 class AdminController extends Controller
 {
@@ -56,6 +57,10 @@ class AdminController extends Controller
             ]);
 
             if($validateStatus->fails()) {
+                LoggerService::error('Error de validación al crear administrador', [
+                    'input' => $request->all(),
+                    'errores' => $validateStatus->errors()
+                ]);
                 return response()->json([
                     'message' => 'Validation error',
                     'errors' => $validateStatus->errors(),
@@ -70,6 +75,9 @@ class AdminController extends Controller
                 ->first();
 
             if(!$invitationCode){
+                LoggerService::error('Código de invitación inválido o expirado', [
+                    'code' => $request->invitation_code
+                ]);
                 return response()->json([
                     'message' => 'Invalid or expired invitation code',
                     'data' => null,
@@ -86,6 +94,7 @@ class AdminController extends Controller
             ]);
 
             if(!$newAdmin){
+                LoggerService::error('Error al crear administrador');
                 return response()->json([
                     'message' => 'Error creating admin',
                     'data' => null,
@@ -102,12 +111,17 @@ class AdminController extends Controller
                 'email' => $newAdmin->email,
             ];
 
+            LoggerService::info('Administrador creado con éxito', $adminResponseDTO);
             return response()->json([
                 'data' => $adminResponseDTO,
                 'status' => 201,
             ], 201);
 
         }catch(\Exception $e){
+            LoggerService::error('Error inesperado al crear administrador', [
+                'mensaje' => $e->getMessage()
+            ]);
+
             return response()->json([
                 'message' => 'Error creating admin',
                 'data' => $e->getMessage(),
@@ -125,6 +139,7 @@ class AdminController extends Controller
             $admin = Admin::find($id);
 
             if (!$admin) {
+                LoggerService::info('No se encontraron administradores');
                 return response()->json([
                     'message' => 'Admin not found',
                     'data' => null,
@@ -132,11 +147,18 @@ class AdminController extends Controller
                 ], 404);
             }
 
+            LoggerService::info('Listado de administradores obtenido', [
+                'total' => $admins->count()
+            ]);
             return response()->json([
                 'data' => new AdminResource($admin),
                 'status' => 200,
             ], 200);
         }catch(\Exception $e){
+            LoggerService::error('Error al obtener administradores', [
+                'mensaje' => $e->getMessage()
+            ]);
+
             return response()->json([
                 'message' => 'Error retrieving admin',
                 'data' => $e->getMessage(),
@@ -154,6 +176,8 @@ class AdminController extends Controller
             $admin = Admin::find($id);
 
             if (!$admin) {
+                LoggerService::error('Administrador no encontrado para actualizar', ['id' => $id]);
+
                 return response()->json([
                     'message' => 'Admin not found',
                     'data' => null,
@@ -189,6 +213,7 @@ class AdminController extends Controller
                 'password' => $admin->password,
             ];
 
+            LoggerService::info('Administrador actualizado', $adminResponseDTO);
             return response()->json([
                 'message' => 'Admin updated successfully',
                 'data' => $adminResponseDTO,
@@ -217,6 +242,10 @@ class AdminController extends Controller
             ]);
 
             if($validateStatusRequest->fails() || $validateStatusId->fails()) {
+                LoggerService::error('Error de validación al eliminar administrador', [
+                    'errores' => $validateStatusRequest->errors() + $validateStatusId->errors()
+                ]);
+
                 return response()->json([
                     'message' => 'Validation error',
                     'errors' => $validateStatusRequest->errors() + $validateStatusId->errors(),
@@ -226,6 +255,8 @@ class AdminController extends Controller
 
             $admin = Admin::find($id);
             if(!$admin) {
+                LoggerService::error('Administrador no encontrado para eliminar', ['id' => $id]);
+
                 return response()->json([
                     'message' => 'Admin not found',
                     'data' => null,
@@ -234,6 +265,11 @@ class AdminController extends Controller
             }
 
             if (!Hash::check($request->password, $admin->password)) {
+                LoggerService::error('Contraseña incorrecta al intentar eliminar admin', [
+                    'id' => $id,
+                    'email' => $admin->email
+                ]);
+
                 return response()->json([
                     'message' => 'Incorrect password',
                     'status' => 403,
@@ -241,12 +277,17 @@ class AdminController extends Controller
             }
             $admin->delete();
 
+            LoggerService::info('Administrador eliminado', ['id' => $id]);
             return response()->json([
                 'message' => 'Admin deleted successfully',
                 'data' => null,
                 'status' => 200,
             ], 200);
         }catch(\Exception $e){
+            LoggerService::error('Error inesperado al eliminar administrador', [
+                'mensaje' => $e->getMessage()
+            ]);
+            
             return response()->json([
                 'message' => 'Error deleting admin',
                 'data' => $e->getMessage(),

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\InvitationCode;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use App\Services\LoggerService;
 
 class InvitationCodeController extends Controller
 {
@@ -15,8 +16,11 @@ class InvitationCodeController extends Controller
     {
         try{
             $codigos = InvitationCode::all();
+            LoggerService::info('Listado de códigos de invitación solicitado', [
+                'total' => count($codigos),
+            ]);
 
-            if(!$codigos){
+            if(!$codigos){  
                 return response()->json([
                     'message' => 'No invitation codes found',
                     'data' => null,
@@ -31,6 +35,10 @@ class InvitationCodeController extends Controller
             ], 200);
 
         }catch(\Exception $e){
+            LoggerService::error('Error al obtener los códigos de invitación', [
+                'mensaje' => $e->getMessage(),
+            ]);
+
             return response()->json([
                 'message' => 'Error retrieving invitation codes',
                 'data' => $e->getMessage(),
@@ -52,6 +60,11 @@ class InvitationCodeController extends Controller
             ]);
 
             if($validateStatus->fails()) {
+                LoggerService::error('Error de validación al crear código de invitación', [
+                    'input' => $request->all(),
+                    'errores' => $validateStatus->errors(),
+                ]);
+
                 return response()->json([
                     'message' => 'Validation error',
                     'errors' => $validateStatus->errors(),
@@ -64,6 +77,11 @@ class InvitationCodeController extends Controller
                 'expires_at' => $request->expires_at,
                 'used_status' => false,
                 'created_at' => now(),
+            ]);
+
+            LoggerService::info('Código de invitación creado', [
+                'id' => $newCode->id,
+                'code' => $newCode->code,
             ]);
 
             if(!$newCode) {
@@ -79,6 +97,11 @@ class InvitationCodeController extends Controller
                 'status' => 201,
             ], 201);
         }catch(\Exception $e){
+            
+            LoggerService::error('Error al crear código de invitación', [
+                'mensaje' => $e->getMessage(),
+            ]);
+
             return response()->json([
                 'message' => 'Error creating invitation code',
                 'data' => $e->getMessage(),
@@ -95,6 +118,8 @@ class InvitationCodeController extends Controller
         try{
             $invitationCode = InvitationCode::find($id);
             if(!$invitationCode) {
+                LoggerService::error('Código de invitación no encontrado', ['id' => $id]);
+
                 return response()->json([
                     'message' => 'Invitation code not found',
                     'data' => null,
@@ -102,11 +127,19 @@ class InvitationCodeController extends Controller
                 ], 404);
             }
 
+             LoggerService::debug('Código de invitación consultado', [
+                'id' => $invitationCode->id,
+            ]);
+
             return response()->json([
                 'data' => $invitationCode,
                 'status' => 200,
             ], 200);
         }catch(\Exception $e){
+             LoggerService::error('Error al consultar código de invitación', [
+                'mensaje' => $e->getMessage(),
+            ]);
+
             return response()->json([
                 'message' => 'Error retrieving invitation code',
                 'data' => $e->getMessage(),
@@ -123,6 +156,8 @@ class InvitationCodeController extends Controller
         try{
             $invitationCode = InvitationCode::find($id);
             if(!$invitationCode) {
+                LoggerService::error('Código de invitación no encontrado para actualizar', ['id' => $id]);
+
                 return response()->json([
                     'message' => 'Invitation code not found',
                     'data' => null,
@@ -149,12 +184,21 @@ class InvitationCodeController extends Controller
                 ], 500);
             }
 
+            LoggerService::info('Código de invitación actualizado', [
+                'id' => $invitationCode->id,
+                'nuevo_estado' => $invitationCode->toArray(),
+            ]);
+
             return response()->json([
                 'message' => 'Invitation code updated successfully',
                 'data' => $invitationCode,
                 'status' => 200,
             ], 200);
         }catch(\Exception $e){
+            LoggerService::error('Error al actualizar código de invitación', [
+                'mensaje' => $e->getMessage(),
+            ]);
+
             return response()->json([
                 'message' => 'Error updating invitation code',
                 'data' => $e->getMessage(),
@@ -171,6 +215,8 @@ class InvitationCodeController extends Controller
         try{
             $invitationCode = InvitationCode::find($id);
             if(!$invitationCode) {
+                LoggerService::error('Código de invitación no encontrado para eliminar', ['id' => $id]);
+
                 return response()->json([
                     'message' => 'Invitation code not found',
                     'data' => null,
@@ -180,12 +226,17 @@ class InvitationCodeController extends Controller
 
             $invitationCode->delete();
 
+             LoggerService::info('Código de invitación eliminado', ['id' => $id]);
             return response()->json([
                 'message' => 'Invitation code deleted successfully',
                 'data' => null,
                 'status' => 200,
             ], 200);
         }catch(\Exception $e){
+            LoggerService::error('Error al eliminar código de invitación', [
+                'mensaje' => $e->getMessage(),
+            ]);
+
             return response()->json([
                 'message' => 'Error deleting invitation code',
                 'data' => $e->getMessage(),
