@@ -34,7 +34,7 @@ class RouteController extends Controller
                 'start_longitude' => 'required|numeric|between:-180,180',
                 'end_latitude' => 'required|numeric|between:-90,90',
                 'end_longitude' => 'required|numeric|between:-180,180',
-                'id_assignment' => 'required|unique:routes,id_assignment|exists:assignments,id',
+                'id_assignment' =>'required|exists:assignments'
             ]);
 
             $route = Route::create($validated);
