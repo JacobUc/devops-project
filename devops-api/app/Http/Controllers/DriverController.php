@@ -130,17 +130,16 @@ class DriverController extends Controller
             return response()->json($data, 404);
         }
         $validator = Validator::make($request->all(), [
-        
-            'name' => 'required',
-            'last_name' => 'required',
-            'birth_date' => 'required|date',
-            'curp' => 'required|unique:driver',
-            'address' => 'required',
-            'monthly_salary' => 'required',
-            'license_number' => 'required|unique:driver',
-            'system_entry_date' => 'required|date'
-
+        'name' => 'required',
+        'last_name' => 'required',
+        'birth_date' => 'required|date',
+        'curp' => 'required|unique:drivers,curp,' . $driver->id_driver . ',id_driver',
+        'address' => 'required',
+        'monthly_salary' => 'required',
+        'license_number' => 'required|unique:drivers,license_number,' . $driver->id_driver . ',id_driver',
+        'system_entry_date' => 'required|date'
         ]);
+
         if ($validator->fails()) {
             LoggerService::error('Error en la validación al actualizar conductor', [
                 'errores' => $validator->errors(),
@@ -172,7 +171,7 @@ class DriverController extends Controller
             'status' => 200
         ];
         LoggerService::info('Conductor actualizado', [
-            'id' => $driver->id
+            'id' => $driver->id_driver
         ]);
         return response()->json($data, 200);
     }
@@ -180,6 +179,7 @@ class DriverController extends Controller
         $driver = Driver::find($id);
 
         if(!$driver){
+            LoggerService::error('Conductor no encontrado para actualización parcial', ['id' => $id]);
             $data = [
                 'message' => 'driver no encontrado',
                 'status' => 404
@@ -191,13 +191,17 @@ class DriverController extends Controller
             'name' => '',
             'last_name' => '',
             'birth_date' => 'date',
-            'curp' => 'unique:driver',
+            'curp' => 'unique:drivers',
             'address' => '',
             'monthly_salary' => '',
-            'license_number' => 'unique:driver',
+            'license_number' => 'unique:drivers',
             'system_entry_date' => 'date'
         ]);
         if ($validator->fails()) {
+             LoggerService::error('Error en la validación al actualizar parcialmente conductor', [
+            'errores' => $validator->errors(),
+            'input' => $request->all()
+            ]);
             $data =[
                 'message' => 'Error en la validación de datos',
                 'errors' => $validator->errors(),
@@ -238,6 +242,10 @@ class DriverController extends Controller
             'driver' => $driver,
             'status' => 200
         ];
+        LoggerService::info('Conductor actualizado parcialmente', [
+        'id' => $driver->id_driver,
+        'campos_actualizados' => array_keys($request->all())
+        ]);
         return response()->json($data, 200);
     }
 }

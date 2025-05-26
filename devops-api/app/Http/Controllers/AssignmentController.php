@@ -125,6 +125,10 @@ class AssignmentController extends Controller
             ], 404);
         }
     
+        LoggerService::info('Asignación obtenida exitosamente', [
+        'id' => $id,
+        'assignment' => $assignment
+         ]);
         return response()->json([
             'message' => 'Assignment retrieved successfully',
             'data' => $assignment

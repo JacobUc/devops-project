@@ -21,6 +21,7 @@ class AdminController extends Controller
             $admins = Admin::all();
 
             if(!$admins){
+                LoggerService::warning('No se encontraron administradores');
                 return response()->json([
                     'message' => 'No admins found',
                     'data' => null,
@@ -28,12 +29,18 @@ class AdminController extends Controller
                 ], 200);
             }
 
+            LoggerService::info('Listado de administradores obtenido', [
+            'total' => $admins->count(),
+            ]);
             return response()->json([
                 'data' => AdminResource::collection($admins),
                 'status' => 200,
             ], 200);
 
         }catch(\Exception $e){
+            LoggerService::error('Error al obtener administradores', [
+            'error' => $e->getMessage(),
+            ]);
             return response()->json([
                 'message' => 'Error retrieving admins',
                 'data' => $e->getMessage(),
