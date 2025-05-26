@@ -13,7 +13,8 @@ class DriverController extends Controller
         $drivers = Driver::all(); 
         if ($drivers->isEmpty()) {
             $data = [
-                'message' => 'No se encontraron conductores',
+                'message' => 'No drivers found',
+                'data' => null,
                 'status' => 404
             ];
             return response()->json($data, 404);
@@ -25,16 +26,16 @@ class DriverController extends Controller
             'name' => 'required',
             'last_name' => 'required',
             'birth_date' => 'required|date',
-            'curp' => 'required',
+            'curp' => 'required|unique:drivers,curp',
             'address' => 'required',
             'monthly_salary' => 'required',
-            'license_number' => 'required',
+            'license_number' => 'required|unique:drivers,license_number',
             'system_entry_date' => 'required|date'
 
         ]);
         if ($validator->fails()) {
             $data =[
-                'message' => 'Error en la validación de datos',
+                'message' => 'Data validation error',
                 'errors' => $validator->errors(),
                 'status' => 400
             ];
@@ -53,13 +54,15 @@ class DriverController extends Controller
         ]);
         if(!$driver){
             $data = [
-                'message' => 'Error al crear al conductor',
+                'message' => 'error creating driver',
+                'data' => null,
                 'status' => 500
             ];
         }
         $data = [
             'driver' => $driver,
-            'status' => 201
+            'status' => 201,
+            'message' => 'Driver created successfully'
         ];
         return response()->json($data, 201);
     }
@@ -68,14 +71,16 @@ class DriverController extends Controller
 
         if(!$driver){
             $data = [
-                'message' => 'Conductor no encontrado',
+                'message' => 'no driver found',
+                'data' => null,
                 'status' => 404
             ];
             return response()->json($data, 404);
         }
         $data = [
             'driver' => $driver,
-            'status' => 200
+            'status' => 200,
+            'message' => 'Driver retrieved successfully'
         ];
         return response()->json($data, 200);
     }
@@ -84,7 +89,8 @@ class DriverController extends Controller
 
         if(!$driver){
             $data = [
-                'message' => 'driver no encontrado',
+                'message' => 'no driver found',
+                'data' => null,
                 'status' => 404
             ];
             return response()->json($data, 404);
@@ -93,6 +99,7 @@ class DriverController extends Controller
 
         $data = [
             'message' => '$driver delete',
+            'data' => null,
             'status' => 200
         ];
         return response()->json($data, 200);
@@ -102,7 +109,8 @@ class DriverController extends Controller
 
         if(!$driver){
             $data = [
-                'message' => 'driver no encontrado',
+                'message' => 'driver not found',
+                'data'=> null,
                 'status' => 404
             ];
             return response()->json($data, 404);
@@ -112,16 +120,15 @@ class DriverController extends Controller
             'name' => 'required',
             'last_name' => 'required',
             'birth_date' => 'required|date',
-            'curp' => 'required|unique:driver',
+            'curp' => 'required|unique:drivers,curp,' . $driver->id_driver . ',id_driver',
             'address' => 'required',
             'monthly_salary' => 'required',
-            'license_number' => 'required|unique:driver',
+            'license_number' => 'required|unique:drivers,license_number,' . $driver->id_driver . ',id_driver',
             'system_entry_date' => 'required|date'
-
         ]);
         if ($validator->fails()) {
             $data =[
-                'message' => 'Error en la validación de datos',
+                'message' => 'error in data validation',
                 'errors' => $validator->errors(),
                 'status' => 400
             ];
@@ -140,8 +147,8 @@ class DriverController extends Controller
         $driver->save();
 
         $data =[
-            'message' => 'driver-> actualizado',
-            'student' => $driver,
+            'message' => 'Updated driver',
+            'data' => $driver,
             'status' => 200
         ];
         return response()->json($data, 200);
@@ -151,21 +158,22 @@ class DriverController extends Controller
 
         if(!$driver){
             $data = [
-                'message' => 'driver no encontrado',
+                'message' => 'no found driver',
+                'data' => null,
                 'status' => 404
             ];
             return response()->json($data, 404);
         }
         $validator = Validator::make($request->all(), [
             
-            'name' => '',
-            'last_name' => '',
-            'birth_date' => 'date',
-            'curp' => 'unique:driver',
-            'address' => '',
-            'monthly_salary' => '',
-            'license_number' => 'unique:driver',
-            'system_entry_date' => 'date'
+            'name' => 'sometimes',
+            'last_name' => 'sometimes',
+            'birth_date' => 'sometimes|date',
+            'curp' => 'sometimes|unique:drivers,curp,' . $driver->id_driver . ',id_driver',
+            'address' => 'sometimes',
+            'monthly_salary' => 'sometimes',
+            'license_number' => 'sometimes|unique:drivers,license_number,' . $driver->id_driver . ',id_driver',
+            'system_entry_date' => 'sometimes|date'
         ]);
         if ($validator->fails()) {
             $data =[
@@ -183,7 +191,7 @@ class DriverController extends Controller
             $driver->last_name = $request->last_name;
         }
         if ($request->has('birth_date')) {
-            $student->birth_date= $request->birth_date;
+            $driver->birth_date= $request->birth_date;
         }
         if ($request->has('curp')) {
             $driver->curp = $request->curp;
@@ -204,8 +212,8 @@ class DriverController extends Controller
         $driver->save();
 
         $data =[
-            'message' => 'driver actualizado',
-            'driver' => $driver,
+            'message' => 'Updated driver',
+            'data' => $driver,
             'status' => 200
         ];
         return response()->json($data, 200);
