@@ -71,10 +71,13 @@ Route::prefix('assignments')->group(function () {
     Route::delete('{id}', [AssignmentController::class, 'destroy']);
 });
 
-Route::get('/drivers', [DriverController::class, 'index']);
-Route::get('/drivers/{id}', [DriverController::class, 'show']);
-Route::post('/drivers', [DriverController::class, 'store']);
-Route::put('/drivers/{id}', [DriverController::class, 'update']);
-Route::patch('/drivers/{id}', [DriverController::class, 'updatePartial']);
-Route::delete('/drivers/{id}', [DriverController::class, 'destroy']);
+// Driver
+Route::middleware('auth:sanctum')->prefix('drivers')->group(function () {
+    Route::get('/', [DriverController::class, 'index']);
+    Route::get('{id}', [DriverController::class, 'show']);
+    Route::post('/', [DriverController::class, 'store']);
+    Route::put('{id}', [DriverController::class, 'update']);
+    Route::patch('{id}', [DriverController::class, 'updatePartial']);
+    Route::delete('{id}', [DriverController::class, 'destroy']);
 
+});

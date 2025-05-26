@@ -28,7 +28,7 @@ class DriverController extends Controller
             'birth_date' => 'required|date',
             'curp' => 'required|unique:drivers,curp',
             'address' => 'required',
-            'monthly_salary' => 'required',
+            'monthly_salary' => 'required|numeric',
             'license_number' => 'required|unique:drivers,license_number',
             'system_entry_date' => 'required|date'
 
@@ -98,7 +98,7 @@ class DriverController extends Controller
         $driver->delete();
 
         $data = [
-            'message' => '$driver delete',
+            'message' => 'driver delete',
             'data' => null,
             'status' => 200
         ];
@@ -122,7 +122,7 @@ class DriverController extends Controller
             'birth_date' => 'required|date',
             'curp' => 'required|unique:drivers,curp,' . $driver->id_driver . ',id_driver',
             'address' => 'required',
-            'monthly_salary' => 'required',
+            'monthly_salary' => 'required|numeric',
             'license_number' => 'required|unique:drivers,license_number,' . $driver->id_driver . ',id_driver',
             'system_entry_date' => 'required|date'
         ]);
@@ -171,7 +171,7 @@ class DriverController extends Controller
             'birth_date' => 'sometimes|date',
             'curp' => 'sometimes|unique:drivers,curp,' . $driver->id_driver . ',id_driver',
             'address' => 'sometimes',
-            'monthly_salary' => 'sometimes',
+            'monthly_salary' => 'sometimes|numeric',
             'license_number' => 'sometimes|unique:drivers,license_number,' . $driver->id_driver . ',id_driver',
             'system_entry_date' => 'sometimes|date'
         ]);
