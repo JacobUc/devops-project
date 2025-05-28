@@ -51,6 +51,11 @@ return [
     */
 
     'channels' => [
+        'elastic' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/elastic.log'), // luego puedes usar HTTP o TCP para Elastic o Loki
+            'level' => 'debug',
+        ],
 
         'stack' => [
             'driver' => 'stack',
