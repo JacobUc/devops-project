@@ -25,6 +25,12 @@ class Handler extends ExceptionHandler
     public function register(): void
     {
         $this->reportable(function (Throwable $e) {
+            LoggerService::error('Excepción no controlada', [
+                'exception' => get_class($e),
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ]);
             //
         });
     }
@@ -32,6 +38,10 @@ class Handler extends ExceptionHandler
     public function render($request, Throwable $exception)
     {
         if ($exception instanceof AuthenticationException) {
+            LoggerService::warning('Intento de acceso no autenticado', [
+                'path' => $request->path(),
+                'ip' => $request->ip(),
+            ]);
             return response()->json([
                 'message' => 'Unauthenticated'
             ], 401);

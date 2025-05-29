@@ -6,6 +6,7 @@ use App\Models\Assignment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
+use App\Services\LoggerService;
 
 class AssignmentController extends Controller
 {
@@ -14,12 +15,15 @@ class AssignmentController extends Controller
         $assignments = Assignment::all();
     
         if ($assignments->isEmpty()) {
+            LoggerService::info('No se encontraron asignaciones');
             return response()->json([
                 'message' => 'No assignments available.',
                 'data' => []
             ], 200);
         }
-    
+        LoggerService::info('Listado de asignaciones obtenido', [
+            'total' => count($assignments)
+        ]);
         return response()->json([
             'message' => 'Assignment list retrieved successfully.',
             'data' => $assignments
@@ -40,6 +44,11 @@ class AssignmentController extends Controller
         ]);
     
         if ($validator->fails()) {
+            LoggerService::error('Error de validación al crear asignación', [
+                'input' => $request->all(),
+                'errores' => $validator->errors()
+            ]);
+
             $data = [
                 'message' => 'Validation errors',
                 'status' => 422,
@@ -62,6 +71,11 @@ class AssignmentController extends Controller
             ->exists();
     
         if ($conflictDriver) {
+            LoggerService::error('Conflicto: conductor ya asignado ese día', [
+                'id_driver' => $idDriver,
+                'fecha' => $assignmentDate
+            ]);
+
             $data = [
                 'message' => 'Driver already has an assignment for this date.',
                 'status' => 409
@@ -70,6 +84,10 @@ class AssignmentController extends Controller
         }
     
         if ($conflictVehicle) {
+            LoggerService::error('Conflicto: vehículo ya asignado ese día', [
+                'id_vehicle' => $idVehicle,
+                'fecha' => $assignmentDate
+            ]);
             $data = [
                 'message' => 'Vehicle already has an assignment for this date.',
                 'status' => 409
@@ -89,6 +107,10 @@ class AssignmentController extends Controller
             'status' => 201,
             'data' => $assignment
         ];
+        LoggerService::info('Asignación creada', [
+            'id' => $assignment->id_assignment,
+            'data' => $assignment->toArray()
+        ]);
         return response()->json($data, 201);
     }
 
@@ -97,11 +119,16 @@ class AssignmentController extends Controller
         $assignment = Assignment::find($id);
     
         if (!$assignment) {
+            LoggerService::error('Asignación no encontrada', ['id' => $id]);
             return response()->json([
                 'message' => 'Assignment not found'
             ], 404);
         }
     
+        LoggerService::info('Asignación obtenida exitosamente', [
+        'id' => $id,
+        'assignment' => $assignment
+         ]);
         return response()->json([
             'message' => 'Assignment retrieved successfully',
             'data' => $assignment
@@ -113,6 +140,7 @@ class AssignmentController extends Controller
         $assignment = Assignment::find($id);
     
         if (!$assignment) {
+            LoggerService::error('Asignación no encontrada para actualizar', ['id' => $id]);
             $data = [
                 'message' => 'Assignment not found',
                 'status' => 404
@@ -123,6 +151,10 @@ class AssignmentController extends Controller
         // Validate that it is not a past assignment
         if (!empty($assignment->assignment_date) && strtotime($assignment->assignment_date) !== false) {
             if (strtotime($assignment->assignment_date) < strtotime(date('Y-m-d'))) {
+                LoggerService::error('Intento de modificar asignación pasada', [
+                'id' => $id,
+                'fecha_asignada' => $assignment->assignment_date
+            ]);
                 $data = [
                     'message' => 'Cannot modify a past assignment',
                     'status' => 403
@@ -149,6 +181,10 @@ class AssignmentController extends Controller
         ]);
     
         if ($validator->fails()) {
+            LoggerService::error('Error de validación al actualizar asignación', [
+                'input' => $request->all(),
+                'errores' => $validator->errors()
+            ]);
             $data = [
                 'message' => 'Validation errors',
                 'errors' => $validator->errors(),
@@ -173,6 +209,10 @@ class AssignmentController extends Controller
             ->exists();
     
         if ($conflictDriver) {
+            LoggerService::error('Conflicto: conductor ya tiene otra asignación ese día', [
+                'id_driver' => $idDriver,
+                'fecha' => $assignmentDate
+            ]);
             $data = [
                 'message' => 'The driver already has an assignment for that date',
                 'status' => 409
@@ -181,6 +221,10 @@ class AssignmentController extends Controller
         }
     
         if ($conflictVehicle) {
+            LoggerService::error('Conflicto: vehículo ya tiene otra asignación ese día', [
+                'id_vehicle' => $idVehicle,
+                'fecha' => $assignmentDate
+            ]);
             $data = [
                 'message' => 'The vehicle already has an assignment for that date',
                 'status' => 409
@@ -200,6 +244,10 @@ class AssignmentController extends Controller
             'assignment' => $assignment,
             'status' => 200
         ];
+        LoggerService::info('Asignación actualizada', [
+            'id' => $assignment->id_assignment,
+            'data' => $assignment->toArray()
+        ]);
         return response()->json($data, 200);
     }
 
@@ -208,6 +256,7 @@ class AssignmentController extends Controller
         $assignment = Assignment::find($id);
     
         if (!$assignment) {
+            LoggerService::error('Asignación no encontrada para eliminar', ['id' => $id]);
             $data = [
                 'message' => 'Assignment not found',
                 'status' => 404
@@ -221,6 +270,7 @@ class AssignmentController extends Controller
             'message' => 'Assignment deleted',
             'status' => 200
         ];
+        LoggerService::info('Asignación eliminada', ['id' => $id]);
         return response()->json($data, 200);
     }
     
