@@ -26,7 +26,7 @@ Route::get('/hello-world', function () {
 });
 
 //primer Aproach de autentificado
-Route::prefix('vehicles')->group(function () {
+Route::middleware('auth:sanctum')->prefix('vehicles')->group(function () {
     //Obtener todos los vehiculos
     Route::get('/', [VehicleController::class, 'index']);
     Route::post('/', [VehicleController::class, 'store']);
@@ -72,12 +72,15 @@ Route::middleware('auth:sanctum')->prefix('assignments')->group(function () {
     Route::delete('{id}', [AssignmentController::class, 'destroy']);
 });
 
-Route::get('/drivers', [DriverController::class, 'index']);
-Route::get('/drivers/{id}', [DriverController::class, 'show']);
-Route::post('/drivers', [DriverController::class, 'store']);
-Route::put('/drivers/{id}', [DriverController::class, 'update']);
-Route::patch('/drivers/{id}', [DriverController::class, 'updatePartial']);
-Route::delete('/drivers/{id}', [DriverController::class, 'destroy']);
+//Drivers
+Route::middleware('auth:sanctum')->prefix('drivers')->group(function () {
+    Route::get('/', [DriverController::class, 'index']);
+    Route::get('/{id}', [DriverController::class, 'show']);
+    Route::post('/', [DriverController::class, 'store']);
+    Route::put('/{id}', [DriverController::class, 'update']);
+    Route::patch('/{id}', [DriverController::class, 'updatePartial']);
+    Route::delete('/{id}', [DriverController::class, 'destroy']);
+});
 
 //Statistics
 Route::middleware('auth:sanctum')->prefix('statistics')->group(function () {
