@@ -12,13 +12,13 @@ class AssignmentController extends Controller
 {
     public function index()
     {
-        $assignments = Assignment::all();
-    
+        $assignments = Assignment::with('route')->paginate(10);
+
         if ($assignments->isEmpty()) {
             LoggerService::info('No se encontraron asignaciones');
             return response()->json([
                 'message' => 'No assignments available.',
-                'data' => []
+                'data' => [],
             ], 200);
         }
         LoggerService::info('Listado de asignaciones obtenido', [
@@ -272,7 +272,6 @@ class AssignmentController extends Controller
         ];
         LoggerService::info('Asignación eliminada', ['id' => $id]);
         return response()->json($data, 200);
-    }
-    
+    } 
 }
 
