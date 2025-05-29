@@ -64,7 +64,7 @@ Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
 });
 
 // Assignment
-Route::prefix('assignments')->group(function () {
+Route::middleware('auth:sanctum')->prefix('assignments')->group(function () {
     Route::get('/', [AssignmentController::class, 'index']);
     Route::get('{id}', [AssignmentController::class, 'show']);
     Route::post('/', [AssignmentController::class, 'store']);
