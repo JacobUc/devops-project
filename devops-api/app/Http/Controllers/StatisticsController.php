@@ -69,7 +69,7 @@ class StatisticsController extends Controller
         }
     }
 
-    public function listVehicles()
+        public function listVehicles()
     {
         try {
             $vehicles = Vehicle::orderByDesc('created_at')->get();
@@ -100,13 +100,9 @@ class StatisticsController extends Controller
     public function listRoutesToday()
     {
         try {
-            $today = Carbon::today()->toDateString();
-
-            $routes = DB::table('routes')
-                ->select('id', 'id_assignment', 'name', 'route_date', 'was_successful', 'problem_description', 'comments', 'start_latitude', 'start_longitude', 'end_latitude', 'end_longitude', 'created_at')
-                ->whereDate('route_date', $today)
-                ->orderByDesc('created_at')
-                ->get();
+            $routes = Route::whereDate('route_date', today())
+               ->orderByDesc('created_at')
+               ->get();
 
             Log::info('Routes retrieved for today', [
                 'date' => $today,
@@ -138,4 +134,5 @@ class StatisticsController extends Controller
             return response()->json($data, 500);
         }
     }
+
 }
