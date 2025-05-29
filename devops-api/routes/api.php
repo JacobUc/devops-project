@@ -80,7 +80,7 @@ Route::patch('/drivers/{id}', [DriverController::class, 'updatePartial']);
 Route::delete('/drivers/{id}', [DriverController::class, 'destroy']);
 
 //Statistics
-Route::prefix('statistics')->group(function () {
+Route::middleware('auth:sanctum')->prefix('statistics')->group(function () {
 Route::get('/users', [StatisticsController::class, 'listUsers']);
 Route::get('/drivers', [StatisticsController::class, 'listDrivers']);
 Route::get('/vehicles', [StatisticsController::class, 'listVehicles']);
