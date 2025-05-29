@@ -29,8 +29,6 @@ class RouteController extends Controller
                 'end_longitude' => 'required|numeric|between:-180,180',
                 'id_assignment' =>'required|exists:assignments'
             ]);
-            $route = Route::create($validated);
-            return response()->json($route, 201);
 
         } catch (ValidationException $e) {
 
@@ -38,7 +36,21 @@ class RouteController extends Controller
                 'message' => 'The data provided is not valid.',
                 'errors' => $e->errors(),
             ], 400);
-        }        
+        }      
+
+        // Validar que no exista otra ruta para este assignment en la misma fecha
+        $exists = Route::where('id_assignment', $request->id_assignment)
+            ->where('route_date', $request->route_date)
+            ->exists();
+        
+        if($exists){
+            return response()->json([
+                'message' => 'A route is already assigned for this vehicle and driver on that date.'
+            ], 409);
+        }
+
+        $route = Route::create($validated);
+        return response()->json($route, 201);
     }
 
     public function show($id)
