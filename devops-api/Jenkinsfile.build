@@ -1,0 +1,47 @@
+pipeline {
+    agent any
+
+    environment {
+        IMAGE_NAME = "devops-api"
+        DOCKERHUB_NAMESPACE = "uadyteam4"
+        BUILD_ID = "${env.BUILD_NUMBER}"
+    }
+
+    stages {
+        stage('Instalar dependencias PHP') {
+            steps {
+                dir('devops-api') {
+                    sh 'composer install --no-dev --optimize-autoloader'
+                    // sh 'php artisan config:cache'
+                    // sh 'php artisan route:cache'
+                }
+            }
+        }
+
+        stage('Construir imagen Docker') {
+            steps {
+                dir('devops-api') {
+                    sh "docker build -t ${IMAGE_NAME}:${BUILD_ID} ."
+                }
+            }
+        }
+
+        stage('Etiquetar imagen') {
+            steps {
+                sh """
+                    docker tag ${IMAGE_NAME}:${BUILD_ID} ${DOCKERHUB_NAMESPACE}/${IMAGE_NAME}:${BUILD_ID}
+                    docker tag ${IMAGE_NAME}:${BUILD_ID} ${DOCKERHUB_NAMESPACE}/${IMAGE_NAME}:latest
+                """
+            }
+        }
+
+        stage('Push a DockerHub') {
+            steps {
+                sh """
+                    docker push ${DOCKERHUB_NAMESPACE}/${IMAGE_NAME}:${BUILD_ID}
+                    docker push ${DOCKERHUB_NAMESPACE}/${IMAGE_NAME}:latest
+                """
+            }
+        }
+    }
+}
