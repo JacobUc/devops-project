@@ -24,4 +24,9 @@ class Assignment extends Model
     {
         return $this->belongsTo(Vehicle::class, 'id_vehicle', 'id_vehicle');
     }
+
+    public function route()
+    {
+        return $this->hasOne(Route::class, 'id_assignment');
+    }
 }

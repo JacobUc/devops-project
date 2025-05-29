@@ -37,15 +37,6 @@ class RouteController extends Controller
                 'id_assignment' =>'required|exists:assignments'
             ]);
 
-            $route = Route::create($validated);
-
-            LoggerService::info('Ruta creada con éxito', [
-                'id' => $route->id,
-                'datos' => $route->toArray(),
-            ]);
-
-            return response()->json($route, 201);
-
         } catch (ValidationException $e) {
             LoggerService::error('Error de validación al crear ruta', [
                 'errores' => $e->errors(),
@@ -56,7 +47,27 @@ class RouteController extends Controller
                 'message' => 'The data provided is not valid.',
                 'errors' => $e->errors(),
             ], 400);
+        }      
+
+        // Validar que no exista otra ruta para este assignment en la misma fecha
+        $exists = Route::where('id_assignment', $request->id_assignment)
+            ->where('route_date', $request->route_date)
+            ->exists();
+        
+        if($exists){
+            return response()->json([
+                'message' => 'A route is already assigned for this vehicle and driver on that date.'
+            ], 409);
         }
+
+        $route = Route::create($validated);
+        
+        LoggerService::info('Ruta creada con éxito', [
+            'id' => $route->id,
+            'datos' => $route->toArray(),
+        ]);
+        
+        return response()->json($route, 201);
     }
 
     public function show($id)
