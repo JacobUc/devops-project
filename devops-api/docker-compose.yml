@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  # Tu aplicación Backend (Laravel)
+  devops-api:
+    image: uadyteam4/devops-api:latest # Usas tu imagen pre-construida
+    container_name: devops-api
+    ports:
+      - "80:80"
+    env_file:
+      - /home/ubuntu/mi-proyecto-laravel/.env # Ruta ABSOLUTA al .env en la VM
+    volumes:
+      - /home/ubuntu/mi-proyecto-laravel/storage/logs:/var/www/html/storage/logs # Logs para Filebeat
+      - /home/ubuntu/mi-proyecto-laravel/storage/app/public:/var/www/html/storage/app/public # Almacenamiento
+    networks:
+      - devops-network
+
+  # Filebeat para recolectar logs de Laravel
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:8.13.0
+    container_name: devops-filebeat
+    user: root
+    volumes:
+
+      - ./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro 
+      - /home/ubuntu/mi-proyecto-laravel/storage/logs:/var/www/html/storage/logs:ro # Acceso de Filebeat a los logs
+
+
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    command: ["-e", "--strict.perms=false"]
+    depends_on:
+      - devops-api
+    networks:
+      - devops-network
+
+  # Grafana
+  grafana:
+    image: grafana/grafana:latest
+    container_name: devops-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=DevOp2s0%5
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - devops-network
+
+networks:
+  devops-network:
+    driver: bridge
+
+volumes:
+  grafana_data:
