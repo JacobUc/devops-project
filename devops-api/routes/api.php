@@ -9,6 +9,7 @@ use App\Http\Controllers\AssignmentController;
 use App\Http\Controllers\DriverController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\InvitationCodeController;
+use App\Http\Controllers\StatisticsController;
 
 
 // Route::get('/user', function (Request $request) {
@@ -78,3 +79,10 @@ Route::put('/drivers/{id}', [DriverController::class, 'update']);
 Route::patch('/drivers/{id}', [DriverController::class, 'updatePartial']);
 Route::delete('/drivers/{id}', [DriverController::class, 'destroy']);
 
+//Statistics
+Route::middleware('auth:sanctum')->prefix('statistics')->group(function () {
+Route::get('/users', [StatisticsController::class, 'listUsers']);
+Route::get('/drivers', [StatisticsController::class, 'listDrivers']);
+Route::get('/vehicles', [StatisticsController::class, 'listVehicles']);
+Route::get('/routes', [StatisticsController::class, 'listRoutesToday']);
+});
