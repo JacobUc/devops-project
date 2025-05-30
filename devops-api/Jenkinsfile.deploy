@@ -1,0 +1,36 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Desplegar vía SSH') {
+            steps {
+                sh '''
+                    ssh ubuntu@40.233.5.25 << 'EOF'
+                    docker stop devops-api 2>/dev/null || echo "Contenedor no estaba en ejecución"
+                    docker rm devops-api 2>/dev/null || echo "Contenedor no existía"
+
+                    docker pull uadyteam4/devops-api:latest || { echo "Error al hacer pull de la imagen"; exit 1; }
+
+                    docker run -d \
+                        --name devops-api \
+                        -p 80:80 \
+                        --env-file /home/ubuntu/.env \
+                        -v /home/ubuntu/laravel-logs:/var/www/html/storage/logs \
+                        -v /home/ubuntu/laravel-storage:/var/www/html/storage/app/public \
+                        uadyteam4/devops-api:latest || { echo "Error al levantar el contenedor"; exit 1; }
+                        
+                    # Para poder escribir logs
+                    sudo chown -R www-data:www-data /home/ubuntu/laravel-logs
+                    sudo chmod -R 775 /home/ubuntu/laravel-logs
+
+                    # Almacenamiento
+                    sudo chown -R www-data:www-data /home/ubuntu/laravel-storage
+                    sudo chmod -R 775 /home/ubuntu/laravel-storage
+                    docker exec devops-api php artisan storage:link || echo "Symlink ya existe o hubo un error"
+
+                    echo "✅ Despliegue completado correctamente"
+                '''
+            }
+        }
+    }
+}
